@@ -1,3 +1,5 @@
+# Trucksoft-Telematics-Inventory
+>>>>>>> df47c5b50fee067adba160e49d4d3ef3e8895075
 # Trucksoft Telematics Inventory System
 
 A comprehensive device synchronization and inventory management system for telematics equipment from multiple partners.
@@ -27,7 +29,10 @@ A comprehensive device synchronization and inventory management system for telem
 - Responsive design with modern UI/UX
 
 ## Live Demo
-[Add your deployment URL here]
+🌐 **[Live Application](https://trucksoftit.github.io/trucksoft-telematics-inventory/)**
 
 ## Contributing
 This project maintains an automated sync system with partner websites. All device data is validated against real product specifications.
+=======
+# Trucksoft-Telematics-Inventory
+>>>>>>> df47c5b50fee067adba160e49d4d3ef3e8895075
