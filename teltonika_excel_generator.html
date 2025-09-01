@@ -1,0 +1,1921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trucksoft Telematics - Complete Inventory System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 50px;
+            box-shadow: 0 32px 64px rgba(0,0,0,0.12), 0 0 0 1px rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);
+            background-size: 400% 100%;
+            animation: gradientShift 8s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .company-logo {
+            font-size: 3.2em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            animation: logoGlow 4s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
+            letter-spacing: -1px;
+        }
+        
+        @keyframes logoGlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .tagline {
+            color: #64748b;
+            font-size: 1.3em;
+            margin-bottom: 35px;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+        
+        .partners {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .partner-badge {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.9em;
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .partner-badge:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 12px 28px rgba(79, 70, 229, 0.4);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            padding: 30px 25px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 12px 24px rgba(99, 102, 241, 0.2);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);
+        }
+        
+        .stat-card:hover::before {
+            left: 100%;
+        }
+        
+        .stat-number {
+            font-size: 2.8em;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .download-section {
+            text-align: center;
+            margin: 60px 0;
+            background: linear-gradient(135deg, #f8faff, #f1f5f9);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px dashed #cbd5e1;
+            position: relative;
+        }
+        
+        .download-section::before {
+            content: '⬇️';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 10px 15px;
+            border-radius: 50%;
+            font-size: 1.5em;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .download-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 1.2em;
+            border-radius: 60px;
+            cursor: pointer;
+            box-shadow: 0 12px 28px rgba(16, 185, 129, 0.3);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            margin: 12px;
+            font-weight: 600;
+            border: 2px solid rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .download-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.4);
+        }
+        
+        .download-btn:hover::before {
+            left: 100%;
+        }
+        
+        .download-btn:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+        
+        .preview {
+            margin-top: 50px;
+            background: linear-gradient(135deg, #f8faff, #f1f5f9);
+            border-radius: 20px;
+            padding: 35px;
+            overflow-x: auto;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid rgba(203, 213, 225, 0.5);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            border: 1px solid rgba(203, 213, 225, 0.3);
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 1px;
+            position: relative;
+        }
+        
+        th::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+        }
+        
+        tbody tr {
+            transition: all 0.3s ease;
+        }
+        
+        tbody tr:hover {
+            background: linear-gradient(135deg, #f8faff, #f1f5f9);
+            transform: scale(1.005);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        .feature-list {
+            max-width: 350px;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+        
+        .company-badge {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        /* Section Headers */
+        .section-header {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 20px;
+            position: relative;
+            padding-left: 15px;
+        }
+        
+        .section-header::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 70%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+        
+        /* Enhanced Company Badges */
+        .teltonika { 
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8); 
+            color: white;
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+        }
+        .naturelink { 
+            background: linear-gradient(135deg, #10b981, #047857); 
+            color: white;
+            box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+        }
+        .mechatronics { 
+            background: linear-gradient(135deg, #ef4444, #dc2626); 
+            color: white;
+            box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+        }
+        .owen { 
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed); 
+            color: white;
+            box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3);
+        }
+        
+        /* Enhanced Category Badges */
+        .tracker { 
+            background: linear-gradient(135deg, #06b6d4, #0891b2); 
+            color: white;
+            box-shadow: 0 3px 6px rgba(6, 182, 212, 0.3);
+        }
+        .video-telematics { 
+            background: linear-gradient(135deg, #ec4899, #db2777); 
+            color: white;
+            box-shadow: 0 3px 6px rgba(236, 72, 153, 0.3);
+        }
+        .fuel-sensor { 
+            background: linear-gradient(135deg, #f59e0b, #d97706); 
+            color: white;
+            box-shadow: 0 3px 6px rgba(245, 158, 11, 0.3);
+        }
+        .accessories { 
+            background: linear-gradient(135deg, #6366f1, #4f46e5); 
+            color: white;
+            box-shadow: 0 3px 6px rgba(99, 102, 241, 0.3);
+        }
+        
+        /* Badge Animations */
+        .company-badge, .category-badge {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 18px;
+            font-weight: 600;
+        }
+        
+        .company-badge:hover, .category-badge:hover {
+            transform: translateY(-1px) scale(1.05);
+        }
+        
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+            
+            .container {
+                padding: 30px 25px;
+                border-radius: 16px;
+            }
+            
+            .company-logo {
+                font-size: 2.5em;
+            }
+            
+            .tagline {
+                font-size: 1.1em;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 15px;
+            }
+            
+            .stat-card {
+                padding: 20px 15px;
+            }
+            
+            .stat-number {
+                font-size: 2.2em;
+            }
+            
+            .download-btn {
+                padding: 15px 25px;
+                font-size: 1em;
+                margin: 8px;
+            }
+            
+            th, td {
+                padding: 10px 8px;
+                font-size: 0.85em;
+            }
+        }
+        
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Loading animation for better UX */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .container > * {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .container > *:nth-child(2) { animation-delay: 0.1s; }
+        .container > *:nth-child(3) { animation-delay: 0.2s; }
+        .container > *:nth-child(4) { animation-delay: 0.3s; }
+        .container > *:nth-child(5) { animation-delay: 0.4s; }
+        
+        .info-panel {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            border-left: 5px solid #3b82f6;
+            padding: 25px;
+            margin: 35px 0;
+            border-radius: 12px;
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.1);
+            position: relative;
+        }
+        
+        .info-panel::before {
+            content: '💡';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: white;
+            padding: 8px 10px;
+            border-radius: 50%;
+            font-size: 1.2em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .platform-info {
+            background: linear-gradient(135deg, #fefce8, #fef3c7);
+            border: 2px solid #f59e0b;
+            padding: 25px;
+            border-radius: 16px;
+            margin: 25px 0;
+            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.1);
+            position: relative;
+        }
+        
+        .platform-info::before {
+            content: '🔗';
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: white;
+            padding: 8px 10px;
+            border-radius: 50%;
+            font-size: 1.2em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .platform-title {
+            color: #dc2626;
+            font-weight: 700;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+        
+        .platforms {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .platform-tag {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+            box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .platform-tag:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(245, 158, 11, 0.4);
+        }
+        
+        /* Sync Management Styles */
+        .sync-section {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border: 2px solid #0ea5e9;
+            padding: 30px;
+            border-radius: 20px;
+            margin: 40px 0;
+            position: relative;
+        }
+        
+        .sync-section::before {
+            content: '🔄';
+            position: absolute;
+            top: -15px;
+            left: 25px;
+            background: white;
+            padding: 8px 12px;
+            border-radius: 50%;
+            font-size: 1.3em;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .sync-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+        
+        .sync-card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        
+        .sync-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+        }
+        
+        .sync-btn {
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+            font-size: 0.9em;
+        }
+        
+        .sync-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(14, 165, 233, 0.3);
+        }
+        
+        .sync-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .sync-status {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        
+        .status-idle {
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .status-syncing {
+            background: #fef3c7;
+            color: #d97706;
+            border: 1px solid #fbbf24;
+        }
+        
+        .status-success {
+            background: #dcfce7;
+            color: #16a34a;
+            border: 1px solid #4ade80;
+        }
+        
+        .status-error {
+            background: #fecaca;
+            color: #dc2626;
+            border: 1px solid #f87171;
+        }
+        
+        .sync-results {
+            margin-top: 40px;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            display: none;
+        }
+        
+        .sync-results.show {
+            display: block;
+            animation: fadeInUp 0.5s ease;
+        }
+        
+        .new-devices-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .device-card {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        
+        .device-card:hover {
+            background: #f1f5f9;
+            transform: translateY(-2px);
+        }
+        
+        .device-card.selected {
+            background: #dbeafe;
+            border-color: #3b82f6;
+        }
+        
+        .add-selected-btn {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .add-selected-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(22, 163, 74, 0.3);
+        }
+        
+        .company-sync-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .sync-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #94a3b8;
+        }
+        
+        .sync-indicator.syncing {
+            background: #f59e0b;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .sync-indicator.success {
+            background: #10b981;
+        }
+        
+        .sync-indicator.error {
+            background: #ef4444;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="company-logo">🚛 TRUCKSOFT TELEMATICS LIMITED</div>
+            <div class="tagline">Complete Telematics Device Inventory Management System</div>
+            <div class="partners">
+                <div class="partner-badge">Teltonika</div>
+                <div class="partner-badge">Naturelink Tech</div>
+                <div class="partner-badge">Mechatronics</div>
+                <div class="partner-badge">Owen</div>
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-number" id="totalProducts">248+</span>
+                Total Products
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">4</span>
+                Partner Companies
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">8</span>
+                Product Categories
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">25+</span>
+                Sub-Categories
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">12+</span>
+                Platforms
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">6</span>
+                Connectivity Types
+            </div>
+        </div>
+        
+        <div class="platform-info">
+            <div class="platform-title">📱 Tracking Software Platforms Integrated:</div>
+            <div class="platforms">
+                <div class="platform-tag">Naturelink Platform</div>
+                <div class="platform-tag">Uffizio Trackzee</div>
+                <div class="platform-tag">Wialon</div>
+            </div>
+        </div>
+        
+        <div class="info-panel">
+            <strong>🎯 Business Objective:</strong><br>
+            This comprehensive inventory system helps Trucksoft Telematics Limited make informed purchasing decisions for stock planning across all partner devices. The system covers trackers, video telematics, fuel sensors, and accessories from Teltonika, Naturelink Tech, Mechatronics, and Owen - all integrated with your chosen platforms (Naturelink, Uffizio Trackzee, and Wialon).
+        </div>
+        
+        <div class="download-section">
+            <h3 class="section-header">📥 Download Complete Inventory Database</h3>
+            <p style="color: #64748b; margin-bottom: 25px; font-size: 1.1em;">Generate comprehensive Excel reports with detailed analysis and stock planning templates</p>
+            <button class="download-btn" onclick="generateMasterExcel()">📊 Master Inventory Database</button>
+            <button class="download-btn" onclick="generateCategoryReport()">📋 Category Analysis Report</button>
+            <button class="download-btn" onclick="generatePartnerReport()">🤝 Partner Comparison Report</button>
+        </div>
+        
+        <div class="sync-section">
+            <h3 class="section-header">🔄 Device Synchronization Center</h3>
+            <p style="color: #64748b; margin-bottom: 25px; font-size: 1.1em;">Automatically sync with partner websites to discover new devices and updates</p>
+            
+            <div class="sync-grid">
+                <div class="sync-card">
+                    <div class="company-sync-status">
+                        <div class="sync-indicator" id="teltonika-indicator"></div>
+                        <h4>Teltonika GPS</h4>
+                    </div>
+                    <p style="color: #64748b; margin-bottom: 15px;">GPS Trackers, Video Telematics, Accessories</p>
+                    <button class="sync-btn" onclick="syncCompanyData('teltonika')" id="teltonika-sync-btn">
+                        🔄 Sync Teltonika
+                    </button>
+                    <button class="sync-btn" onclick="viewCompanyProducts('teltonika')">
+                        👁️ View Products
+                    </button>
+                    <div class="sync-status status-idle" id="teltonika-status">Ready to sync</div>
+                </div>
+                
+                <div class="sync-card">
+                    <div class="company-sync-status">
+                        <div class="sync-indicator" id="naturelink-indicator"></div>
+                        <h4>Naturelink Tech</h4>
+                    </div>
+                    <p style="color: #64748b; margin-bottom: 15px;">GNSS Trackers, AI Dashcam, Mobile DVR, Cameras</p>
+                    <button class="sync-btn" onclick="syncCompanyData('naturelink')" id="naturelink-sync-btn">
+                        🔄 Sync Naturelink
+                    </button>
+                    <button class="sync-btn" onclick="viewCompanyProducts('naturelink')">
+                        👁️ View Products
+                    </button>
+                    <div class="sync-status status-idle" id="naturelink-status">Ready to sync</div>
+                </div>
+                
+                <div class="sync-card">
+                    <div class="company-sync-status">
+                        <div class="sync-indicator" id="eurosens-indicator"></div>
+                        <h4>Eurosens (Mechatronics)</h4>
+                    </div>
+                    <p style="color: #64748b; margin-bottom: 15px;">Fuel Sensors, Load Monitoring, Industrial Solutions</p>
+                    <button class="sync-btn" onclick="syncCompanyData('eurosens')" id="eurosens-sync-btn">
+                        🔄 Sync Eurosens
+                    </button>
+                    <button class="sync-btn" onclick="viewCompanyProducts('eurosens')">
+                        👁️ View Products
+                    </button>
+                    <div class="sync-status status-idle" id="eurosens-status">Ready to sync</div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="download-btn" onclick="syncAllCompanies()" id="sync-all-btn">
+                    ⚡ Sync All Companies
+                </button>
+                <button class="download-btn" onclick="showSyncHistory()">
+                    📊 Sync History
+                </button>
+            </div>
+        </div>
+        
+        <div class="sync-results" id="sync-results">
+            <h3 class="section-header">🆕 New Devices Found</h3>
+            <div id="sync-summary" style="margin-bottom: 20px;"></div>
+            <div class="new-devices-grid" id="new-devices-grid"></div>
+            <button class="add-selected-btn" onclick="addSelectedDevices()" id="add-selected-btn" style="display: none;">
+                ➕ Add Selected Devices to Inventory
+            </button>
+        </div>
+        
+        <div class="preview">
+            <h3 class="section-header">📋 Inventory Preview</h3>
+            <p style="color: #64748b; margin-bottom: 20px; font-size: 1.1em;">Sample products from each partner company - complete database available in Excel downloads</p>
+            <div id="tableContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        // Complete inventory data for all partners
+        const inventoryData = [
+            // TELTONIKA - Basic Trackers
+            { company: "Teltonika", category: "Tracker", subcategory: "Basic", name: "FMB920", connectivity: "2G", platform: "FMB", features: "Eco driving scenario; Slim design; Extensive remote monitoring; 3 connectivity options", status: "Bestseller", price_range: "Mid", use_case: "Fleet Management" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Basic", name: "FMC920", connectivity: "4G", platform: "FMC", features: "Eco driving scenario; Slim design; Extensive remote monitoring; 3 connectivity options", status: "Bestseller", price_range: "Mid", use_case: "Fleet Management" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Basic", name: "FTC921", connectivity: "4G", platform: "FT", features: "FT platform device; High voltage power supply; Longer performance", status: "New", price_range: "Mid", use_case: "Heavy Vehicles" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Basic", name: "FTC961", connectivity: "4G", platform: "FT", features: "FT platform device; IP69K waterproof casing; High voltage power supply", status: "New", price_range: "Mid", use_case: "Heavy Vehicles" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Basic", name: "FMB900", connectivity: "2G", platform: "FMB", features: "Extended product usage scenarios; Extensive remote monitoring; Slim design", status: "Standard", price_range: "Budget", use_case: "Basic Tracking" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Basic", name: "FMB910", connectivity: "2G", platform: "FMB", features: "Extended product usage scenarios; Extensive remote monitoring; External power independence", status: "Standard", price_range: "Budget", use_case: "Basic Tracking" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Basic", name: "FMB930", connectivity: "2G", platform: "FMB", features: "Power supply range for integration variety; Ultra-low 1 mA power consumption", status: "Standard", price_range: "Budget", use_case: "Low Power Applications" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Basic", name: "FMB965", connectivity: "2G", platform: "FMB", features: "Protection against dust and water; Ultra-low 1 mA power consumption; Prolonged autonomous usage", status: "Standard", price_range: "Budget", use_case: "Outdoor Applications" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Basic", name: "FMM920", connectivity: "M1", platform: "FMM", features: "Eco driving scenario; Slim design; Extensive remote monitoring; 3 connectivity options", status: "Standard", price_range: "Mid", use_case: "IoT Applications" },
+            
+            // TELTONIKA - Advanced Trackers
+            { company: "Teltonika", category: "Tracker", subcategory: "Advanced", name: "FMC130", connectivity: "4G", platform: "FMC", features: "Extensive remote monitoring; CAN adapter support; Accurate fuel usage control; 3 connectivity options", status: "Bestseller", price_range: "Premium", use_case: "Advanced Fleet Management" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Advanced", name: "FMB110", connectivity: "2G", platform: "FMB", features: "Extended product usage scenarios; Temperature monitoring; Extensive remote monitoring", status: "Standard", price_range: "Mid", use_case: "Temperature Monitoring" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Advanced", name: "FMB120", connectivity: "2G", platform: "FMB", features: "Extended product usage scenarios; Temperature monitoring; Eco driving scenario", status: "Standard", price_range: "Mid", use_case: "Temperature + Eco Driving" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Advanced", name: "FMB122", connectivity: "2G", platform: "FMB", features: "Extended product usage scenarios; More mounting options; Temperature monitoring", status: "Standard", price_range: "Mid", use_case: "Flexible Installation" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Advanced", name: "FMB130", connectivity: "2G", platform: "FMB", features: "Extensive remote monitoring; CAN adapter support; Accurate fuel usage control; 3 connectivity options", status: "Standard", price_range: "Premium", use_case: "Advanced Fleet Management" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Advanced", name: "FMB202", connectivity: "Battery", platform: "FMB", features: "Perfect for two-wheelers; Protection against dust and water; Prolonged autonomous usage; 2 battery options", status: "Standard", price_range: "Mid", use_case: "Two-Wheeler Tracking" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Advanced", name: "FMB204", connectivity: "Battery", platform: "FMB", features: "Perfect for two-wheelers; Protection against dust and water; Prolonged autonomous usage; 2 battery options", status: "Standard", price_range: "Mid", use_case: "Two-Wheeler Tracking" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Advanced", name: "FMB209", connectivity: "2G", platform: "FMB", features: "Available in two versions; Protection against dust and water; Fuel monitoring", status: "Standard", price_range: "Mid", use_case: "Fuel Monitoring" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Advanced", name: "FMB230", connectivity: "2G", platform: "FMB", features: "Protection against dust and water; No additional tools needed; Different cable options; 3 connectivity options", status: "Standard", price_range: "Mid", use_case: "Easy Installation" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Advanced", name: "FMC230", connectivity: "4G", platform: "FMC", features: "Protection against dust and water; No additional tools needed; Different cable options; 3 connectivity options", status: "Standard", price_range: "Mid", use_case: "Easy Installation" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Advanced", name: "FMC234", connectivity: "4G", platform: "FMC", features: "Prolonged autonomous device usage; Protection against dust and water; No additional tools needed", status: "Standard", price_range: "Mid", use_case: "Autonomous Operation" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Advanced", name: "FMM130", connectivity: "M1", platform: "FMM", features: "Extensive remote monitoring; CAN adapter support; Accurate fuel usage control; 3 connectivity options", status: "Standard", price_range: "Premium", use_case: "IoT Fleet Management" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Advanced", name: "FMM13A", connectivity: "4G", platform: "FMM", features: "Certified for North America; Extensive remote monitoring; CAN adapter support", status: "Standard", price_range: "Premium", use_case: "North American Market" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Advanced", name: "FMM230", connectivity: "M1", platform: "FMM", features: "Protection against dust and water; No additional tools needed; Different cable options; 3 connectivity options", status: "Standard", price_range: "Mid", use_case: "IoT Easy Installation" },
+            
+            // TELTONIKA - Fast & Easy
+            { company: "Teltonika", category: "Tracker", subcategory: "Fast & Easy", name: "FTC880", connectivity: "4G", platform: "FT", features: "FT platform device; Fast installation; IP69K waterproof casing; 2 connectivity options", status: "New", price_range: "Mid", use_case: "Quick Deploy" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Fast & Easy", name: "FTC881", connectivity: "4G", platform: "FT", features: "FT platform device; Fast installation; High voltage power supply", status: "New", price_range: "Mid", use_case: "Quick Deploy Heavy Vehicles" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Fast & Easy", name: "FTM880", connectivity: "M1", platform: "FT", features: "FT platform device; Fast installation; IP69K waterproof casing; 2 connectivity options", status: "New", price_range: "Mid", use_case: "IoT Quick Deploy" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Fast & Easy", name: "FMC880", connectivity: "4G", platform: "FMC", features: "Improved GNSS tracking accuracy; Fast installation; Robust casing; 3 connectivity options", status: "Trending", price_range: "Mid", use_case: "High Accuracy Tracking" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Fast & Easy", name: "FMB010", connectivity: "2G", platform: "FMB", features: "Effortless Plug & Play installation; Eco driving scenario; Accurate crash trace data; 3 connectivity options", status: "Standard", price_range: "Budget", use_case: "Plug & Play" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Fast & Easy", name: "FMB020", connectivity: "2G", platform: "FMB", features: "Ultra-small casing; Effortless Plug & Play installation; Eco driving scenario", status: "Standard", price_range: "Budget", use_case: "Compact Tracking" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Fast & Easy", name: "FMC800", connectivity: "4G", platform: "FMC", features: "Effortless Plug & Play installation; Eco driving scenario; Accurate crash trace data; 3 connectivity options", status: "Standard", price_range: "Mid", use_case: "4G Plug & Play" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Fast & Easy", name: "FMM800", connectivity: "M1", platform: "FMM", features: "Effortless Plug & Play installation; Eco driving scenario; Accurate crash trace data; 3 connectivity options", status: "Standard", price_range: "Mid", use_case: "IoT Plug & Play" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Fast & Easy", name: "FMM80A", connectivity: "M1", platform: "FMM", features: "Reliable global coverage; Effortless Plug & Play installation; Accurate crash trace data", status: "Standard", price_range: "Mid", use_case: "Global IoT Tracking" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Fast & Easy", name: "FMM880", connectivity: "M1", platform: "FMM", features: "Improved GNSS tracking accuracy; Fast installation; Robust casing; 3 connectivity options", status: "Standard", price_range: "Mid", use_case: "IoT High Accuracy" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Fast & Easy", name: "FMP100", connectivity: "2G", platform: "FMP", features: "Custom built-in button; Device status and vehicle events; Charger for external devices", status: "Standard", price_range: "Mid", use_case: "Custom Button Control" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Fast & Easy", name: "FMT100", connectivity: "2G", platform: "FMT", features: "Fast installation; Accurate crash trace data; Compact robust casing; 3 connectivity options", status: "Standard", price_range: "Mid", use_case: "Compact Fast Install" },
+            
+            // TELTONIKA - CAN Data
+            { company: "Teltonika", category: "Tracker", subcategory: "CAN Data", name: "FMC250", connectivity: "4G", platform: "FMC", features: "Protection against dust and water; Built-in CAN bus data reading chip; Supported vehicle data list; 2 connectivity options", status: "New", price_range: "Premium", use_case: "CAN Bus Integration" },
+            { company: "Teltonika", category: "Tracker", subcategory: "CAN Data", name: "FMM250", connectivity: "M1", platform: "FMM", features: "Protection against dust and water; Built-in CAN bus data reading chip; Supported vehicle data list; 2 connectivity options", status: "New", price_range: "Premium", use_case: "IoT CAN Integration" },
+            { company: "Teltonika", category: "Tracker", subcategory: "CAN Data", name: "FMB140", connectivity: "2G", platform: "FMB", features: "Built-in CAN bus data reading chip; Helpful wiring guides; Eco driving scenario", status: "Standard", price_range: "Premium", use_case: "2G CAN Integration" },
+            { company: "Teltonika", category: "Tracker", subcategory: "CAN Data", name: "FMB150", connectivity: "2G", platform: "FMB", features: "Built-in CAN bus data reading chip; Supporting over 40 CAN parameters; CAN data reading from EVs; 3 connectivity options", status: "Standard", price_range: "Premium", use_case: "Advanced CAN + EV" },
+            { company: "Teltonika", category: "Tracker", subcategory: "CAN Data", name: "FMB240", connectivity: "2G", platform: "FMB", features: "Integrated CAN reader; Protection against dust and water; Easy click to close case", status: "Standard", price_range: "Premium", use_case: "Integrated CAN" },
+            { company: "Teltonika", category: "Tracker", subcategory: "CAN Data", name: "FMC150", connectivity: "4G", platform: "FMC", features: "Built-in CAN bus data reading chip; Supporting over 40 CAN parameters; CAN data reading from EVs; 3 connectivity options", status: "Standard", price_range: "Premium", use_case: "4G Advanced CAN + EV" },
+            { company: "Teltonika", category: "Tracker", subcategory: "CAN Data", name: "FMM150", connectivity: "M1", platform: "FMM", features: "Built-in CAN bus data reading chip; Supporting over 40 CAN parameters; CAN data reading from EVs; 3 connectivity options", status: "Standard", price_range: "Premium", use_case: "IoT Advanced CAN + EV" },
+            
+            // TELTONIKA - OBD Data
+            { company: "Teltonika", category: "Tracker", subcategory: "OBD Data", name: "FMC003", connectivity: "4G", platform: "FMC", features: "Reading OBD OEM parameters; Effortless Plug & Play installation; Electric vehicle support; 3 connectivity options", status: "Trending", price_range: "Mid", use_case: "OBD + EV Support" },
+            { company: "Teltonika", category: "Tracker", subcategory: "OBD Data", name: "FMB001", connectivity: "2G", platform: "FMB", features: "Extended product usage scenarios; Reading OBD OEM parameters; Standard OBD data reading", status: "Standard", price_range: "Budget", use_case: "Basic OBD" },
+            { company: "Teltonika", category: "Tracker", subcategory: "OBD Data", name: "FMB003", connectivity: "2G", platform: "FMB", features: "Reading OBD OEM parameters; Ultra-small Plug & Play casing; Electric vehicle support; 3 connectivity options", status: "Standard", price_range: "Mid", use_case: "Compact OBD + EV" },
+            { company: "Teltonika", category: "Tracker", subcategory: "OBD Data", name: "FMM003", connectivity: "M1", platform: "FMM", features: "Reading OBD OEM parameters; Effortless Plug & Play installation; Electric vehicle support; 3 connectivity options", status: "Standard", price_range: "Mid", use_case: "IoT OBD + EV" },
+            { company: "Teltonika", category: "Tracker", subcategory: "OBD Data", name: "FMM00A", connectivity: "M1", platform: "FMM", features: "Reliable global coverage; Reading OBD OEM parameters; Supported vehicle and data list", status: "Standard", price_range: "Mid", use_case: "Global IoT OBD" },
+            
+            // TELTONIKA - E-Mobility
+            { company: "Teltonika", category: "Tracker", subcategory: "E-Mobility", name: "FTC305", connectivity: "4G", platform: "FT", features: "FT platform device; E-mobility CAN data reading; Unique no-casing option; 2 connectivity options", status: "New", price_range: "Premium", use_case: "Electric Vehicle Tracking" },
+            { company: "Teltonika", category: "Tracker", subcategory: "E-Mobility", name: "FTM305", connectivity: "M1", platform: "FT", features: "FT platform device; E-mobility CAN data reading; Protection against dust and water; 2 connectivity options", status: "New", price_range: "Premium", use_case: "IoT Electric Vehicle" },
+            { company: "Teltonika", category: "Tracker", subcategory: "E-Mobility", name: "TFT100", connectivity: "2G", platform: "TFT", features: "High voltage support; Extensive data reading; CAN, RS232, RS485, UART support", status: "Standard", price_range: "Premium", use_case: "High Voltage EV" },
+            
+            // TELTONIKA - Professional
+            { company: "Teltonika", category: "Tracker", subcategory: "Professional", name: "FMC650", connectivity: "4G", platform: "FMC", features: "Reliable global coverage separate GNSS module; Remote download Tachograph files live data; CAN data reading heavy vehicles special machinery; 2 connectivity options", status: "Trending", price_range: "Enterprise", use_case: "Professional Fleet" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Professional", name: "FMB125", connectivity: "2G", platform: "FMB", features: "Fuel monitoring and more; Significantly lower roaming costs; Accurate fuel usage control; 3 connectivity options", status: "Standard", price_range: "Premium", use_case: "Fuel Management" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Professional", name: "FMB225", connectivity: "2G", platform: "FMB", features: "Protection against dust and water; Significantly lower roaming costs; Fuel monitoring; 2 connectivity options", status: "Standard", price_range: "Premium", use_case: "Rugged Fuel Management" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Professional", name: "FMC125", connectivity: "4G", platform: "FMC", features: "Fuel monitoring and more; Significantly lower roaming costs; Accurate fuel usage control; 3 connectivity options", status: "Standard", price_range: "Premium", use_case: "4G Fuel Management" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Professional", name: "FMC225", connectivity: "4G", platform: "FMC", features: "Protection against dust and water; Significantly lower roaming costs; Fuel monitoring; 2 connectivity options", status: "Standard", price_range: "Premium", use_case: "4G Rugged Fuel Management" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Professional", name: "FMM125", connectivity: "M1", platform: "FMM", features: "Fuel monitoring and more; Significantly lower roaming costs; Accurate fuel usage control; 3 connectivity options", status: "Standard", price_range: "Premium", use_case: "IoT Fuel Management" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Professional", name: "FMM650", connectivity: "M1", platform: "FMM", features: "Reliable global coverage separate GNSS module; Remote download Tachograph files live data; CAN data reading heavy vehicles special machinery; 2 connectivity options", status: "Standard", price_range: "Enterprise", use_case: "IoT Professional Fleet" },
+            
+            // TELTONIKA - Assets & Workforce
+            { company: "Teltonika", category: "Tracker", subcategory: "Assets & Workforce", name: "GH5200", connectivity: "2G", platform: "GH", features: "Two-way voice communication; Programmable buttons; Alarm button", status: "Standard", price_range: "Mid", use_case: "Personnel Tracking" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Assets & Workforce", name: "TAT100", connectivity: "2G", platform: "TAT", features: "Periodic location reports; Backup tracking; Extendable battery life; 3 connectivity options", status: "Standard", price_range: "Budget", use_case: "Asset Tracking" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Assets & Workforce", name: "TAT140", connectivity: "4G", platform: "TAT", features: "Periodic location reports; Backup tracking; Extendable battery life; 3 connectivity options", status: "Standard", price_range: "Mid", use_case: "4G Asset Tracking" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Assets & Workforce", name: "TAT141", connectivity: "M1", platform: "TAT", features: "Periodic location reports; Backup tracking; Extendable battery life; 3 connectivity options", status: "Standard", price_range: "Mid", use_case: "IoT Asset Tracking" },
+            { company: "Teltonika", category: "Tracker", subcategory: "Assets & Workforce", name: "TAT240", connectivity: "4G", platform: "TAT", features: "Tamper alerts for maximum safety; Movement-based periodic reports; Easy magnetic mounting", status: "Standard", price_range: "Mid", use_case: "Secure Asset Tracking" },
+            
+            // TELTONIKA - Accessories
+            { company: "Teltonika", category: "Accessories", subcategory: "Eye Beacon", name: "EYE BEACON", connectivity: "Bluetooth", platform: "Teltonika", features: "Bluetooth Low Energy beacon; Asset identification; Indoor positioning; Long battery life", status: "Standard", price_range: "Budget", use_case: "Asset Identification" },
+            { company: "Teltonika", category: "Accessories", subcategory: "Eye Sensors", name: "EYE TEMP", connectivity: "Bluetooth", platform: "Teltonika", features: "Temperature monitoring; Bluetooth LE; Waterproof; Long battery life", status: "Standard", price_range: "Budget", use_case: "Temperature Monitoring" },
+            { company: "Teltonika", category: "Accessories", subcategory: "Eye Sensors", name: "EYE SENSOR", connectivity: "Bluetooth", platform: "Teltonika", features: "Multi-sensor device; Temperature, humidity, light; Bluetooth LE; Long battery life", status: "Standard", price_range: "Budget", use_case: "Environmental Monitoring" },
+            { company: "Teltonika", category: "Accessories", subcategory: "Tags", name: "ID TAG", connectivity: "RFID", platform: "Teltonika", features: "Driver identification; Access control; RFID technology; Durable design", status: "Standard", price_range: "Budget", use_case: "Driver ID" },
+            { company: "Teltonika", category: "Accessories", subcategory: "Power", name: "PWR CABLE", connectivity: "Wired", platform: "Teltonika", features: "Power supply cable; Various vehicle types; High quality materials; Easy installation", status: "Standard", price_range: "Budget", use_case: "Power Supply" },
+            { company: "Teltonika", category: "Accessories", subcategory: "Antennas", name: "GNSS ANTENNA", connectivity: "Wired", platform: "Teltonika", features: "External GNSS antenna; High gain; Weather resistant; Easy mounting", status: "Standard", price_range: "Budget", use_case: "Signal Enhancement" },
+            { company: "Teltonika", category: "Accessories", subcategory: "Antennas", name: "GSM ANTENNA", connectivity: "Wired", platform: "Teltonika", features: "External GSM antenna; High gain; Weather resistant; Easy mounting", status: "Standard", price_range: "Budget", use_case: "Signal Enhancement" },
+            
+            // NATURELINK TECH Products
+            { company: "Naturelink Tech", category: "Tracker", subcategory: "GNSS Vehicle Tracker", name: "NL01", connectivity: "4G LTE/CAT1/CATM1", platform: "Naturelink", features: "Versatile GNSS vehicle tracker; CAT1 or CATM1/NB-IoT connectivity; 500mAh backup battery; High gain built-in GNSS and LTE antenna; Rich inputs and outputs; Configurable I/O", status: "Standard", price_range: "Premium", use_case: "Fleet Management" },
+            { company: "Naturelink Tech", category: "Tracker", subcategory: "GNSS Vehicle Tracker", name: "NL02", connectivity: "4G LTE CAT1", platform: "Naturelink", features: "Cost-effective IP67 waterproof; 4G LTE CAT 1 GNSS tracker; Bluetooth 5.0 connectivity; Internal backup battery; High-gain built-in antennas; BLE and analog sensor support", status: "Standard", price_range: "Mid", use_case: "Basic Track & Trace" },
+            { company: "Naturelink Tech", category: "Tracker", subcategory: "GNSS Vehicle Tracker", name: "NL02L", connectivity: "4G LTE CAT1", platform: "Naturelink", features: "Cost-effective IP67 waterproof; 4G LTE CAT 1 GNSS tracker; Bluetooth 5.0 connectivity; Internal backup battery; Small and smart design; BLE and analog sensor support", status: "Standard", price_range: "Mid", use_case: "Fleet Management" },
+            
+            // AI Dashcam Products
+            { company: "Naturelink Tech", category: "Video Telematics", subcategory: "AI Dashcam", name: "NL12", connectivity: "4G & WiFi", platform: "Naturelink", features: "AI Dashcam with DMS and ADAS functions; Built-in high-speed AI processor; Linux embedded OS; High accuracy AI algorithm; Vehicle video monitoring and AI alarms", status: "Standard", price_range: "Premium", use_case: "AI Video Surveillance" },
+            
+            // Mobile DVR Products
+            { company: "Naturelink Tech", category: "Video Telematics", subcategory: "Mobile DVR", name: "NL10-04", connectivity: "4G LTE", platform: "Naturelink", features: "4CH AI Mobile DVR; DMS, ADAS and BDS functions; Vehicle video surveillance solutions; Advanced AI processing", status: "Standard", price_range: "Premium", use_case: "4CH AI MDVR" },
+            { company: "Naturelink Tech", category: "Video Telematics", subcategory: "Mobile DVR", name: "NL10-08", connectivity: "4G LTE", platform: "Naturelink", features: "8CH AI Mobile DVR; DMS, ADAS and BDS functions; Vehicle video surveillance solutions; Extended channel capacity", status: "Standard", price_range: "Enterprise", use_case: "8CH AI MDVR" },
+            
+            // Camera Products
+            { company: "Naturelink Tech", category: "Accessories", subcategory: "Cameras", name: "NL-CA01", connectivity: "Wired AHD", platform: "Naturelink", features: "Outdoor rear view camera; 1080P/720P resolution; High-performance 2MP CMOS sensor; Smart IR CUT for Day&Night mode; Excellent picture quality", status: "Standard", price_range: "Budget", use_case: "Rear View Camera" },
+            { company: "Naturelink Tech", category: "Accessories", subcategory: "Cameras", name: "NL-CA05", connectivity: "Wired AHD", platform: "Naturelink", features: "Outdoor side view camera; 1080P/720P resolution; High-performance 2MP CMOS sensor; Smart IR CUT for Day&Night mode; Excellent picture quality", status: "Standard", price_range: "Budget", use_case: "Side View Camera" },
+            { company: "Naturelink Tech", category: "Accessories", subcategory: "Cameras", name: "NL-CA07", connectivity: "Wired AHD", platform: "Naturelink", features: "Indoor cabin view camera; 1080P/720P resolution; High-performance 2MP CMOS sensor; Smart IR CUT for Day&Night mode; Mini dome design", status: "Standard", price_range: "Budget", use_case: "Mini Dome Camera" },
+            { company: "Naturelink Tech", category: "Accessories", subcategory: "Cameras", name: "NL-CA08", connectivity: "Wired AHD", platform: "Naturelink", features: "Outdoor rear/front view camera; 1080P/720P resolution; High-performance 2MP CMOS sensor; Smart IR CUT for Day&Night mode; Versatile mounting", status: "Standard", price_range: "Budget", use_case: "Rear View Camera" },
+            { company: "Naturelink Tech", category: "Accessories", subcategory: "Cameras", name: "NL-CA15", connectivity: "Wired AHD", platform: "Naturelink", features: "Outdoor mini side view camera; 1080P/720P resolution; High-performance 2MP CMOS sensor; Smart IR CUT for Day&Night mode; Compact design", status: "Standard", price_range: "Budget", use_case: "Side View Camera" },
+            
+            // MECHATRONICS (EUROSENS) Products
+            // Fuel Level Sensors
+            { company: "Mechatronics", category: "Fuel Sensor", subcategory: "Level Sensors", name: "Eurosens Dominator", connectivity: "RS485/CAN", platform: "Universal", features: "Modular capacitive fuel level sensor; Analog/frequency, RS232/RS485, CAN interfaces; Commercial metering approved; Multiple tank support", status: "Standard", price_range: "Premium", use_case: "Fuel Level Monitoring" },
+            { company: "Mechatronics", category: "Fuel Sensor", subcategory: "Level Sensors", name: "Eurosens Dominator Bt", connectivity: "Bluetooth BLE", platform: "Universal", features: "Wireless capacitive fuel level sensor; Bluetooth BLE interface; Battery powered; Easy installation; Remote monitoring", status: "New", price_range: "Premium", use_case: "Wireless Fuel Monitoring" },
+            { company: "Mechatronics", category: "Fuel Sensor", subcategory: "Level Sensors", name: "Eurosens Dominator Mini", connectivity: "RS485", platform: "Universal", features: "Compact modular sensor; Minimal height design; Space-constrained installations; High accuracy; Temperature compensation", status: "Standard", price_range: "Mid", use_case: "Compact Fuel Monitoring" },
+            { company: "Mechatronics", category: "Fuel Sensor", subcategory: "Level Sensors", name: "Eurosens MWS", connectivity: "RS485", platform: "Universal", features: "Radar distance and level meter; Food and aggressive liquids compatible; Bulk products measurement; Non-contact technology", status: "Standard", price_range: "Premium", use_case: "Radar Level Monitoring" },
+            { company: "Mechatronics", category: "Fuel Sensor", subcategory: "Level Sensors", name: "Eurosens Dizzi", connectivity: "RS485", platform: "Universal", features: "Ultrasonic liquid level sensor; Bottom-tank measurement; No tank cutting required; Weather resistant; Easy installation", status: "Standard", price_range: "Mid", use_case: "Ultrasonic Level Monitoring" },
+            { company: "Mechatronics", category: "Fuel Sensor", subcategory: "Level Sensors", name: "Eurosens LPS", connectivity: "RS485", platform: "Universal", features: "Fuel presence control sensor; Fuel truck drain lines; Leak detection; Real-time monitoring; Alert system", status: "New", price_range: "Mid", use_case: "Fuel Presence Control" },
+            
+            // Fuel Flow Meters
+            { company: "Mechatronics", category: "Fuel Sensor", subcategory: "Flow Meters", name: "Eurosens Direct", connectivity: "RS485", platform: "Universal", features: "Single-chamber fuel flow sensor; Up to 500 L/h measurement; High accuracy; Commercial metering approved; Diesel engines compatible", status: "Standard", price_range: "Premium", use_case: "Direct Fuel Flow" },
+            { company: "Mechatronics", category: "Fuel Sensor", subcategory: "Flow Meters", name: "Eurosens Delta", connectivity: "RS485", platform: "Universal", features: "High-precision differential flow sensor; Modern diesel engines; Return line monitoring; Temperature compensation; Anti-fraud protection", status: "Standard", price_range: "Premium", use_case: "Differential Fuel Flow" },
+            { company: "Mechatronics", category: "Fuel Sensor", subcategory: "Flow Meters", name: "Eurosens Direct 1500", connectivity: "RS485", platform: "Universal", features: "Heavy-duty flow sensor; 15-1500 L/h range; Direct diesel measurement; Commercial approved; Industrial applications", status: "Standard", price_range: "Enterprise", use_case: "Heavy Duty Flow" },
+            { company: "Mechatronics", category: "Fuel Sensor", subcategory: "Flow Meters", name: "Eurosens Direct 3000", connectivity: "RS485", platform: "Universal", features: "High-capacity flow sensor; 50-3000 L/h range; Large engine applications; Robust construction; Commercial grade", status: "Standard", price_range: "Enterprise", use_case: "High Capacity Flow" },
+            { company: "Mechatronics", category: "Fuel Sensor", subcategory: "Flow Meters", name: "Eurosens Direct 5000", connectivity: "RS485", platform: "Universal", features: "Maximum capacity flow sensor; 100-5000 L/h range; Industrial diesel applications; Ultra-robust design; Commercial metering", status: "Standard", price_range: "Enterprise", use_case: "Industrial Flow Monitoring" },
+            
+            // Accessories and Additional Equipment
+            { company: "Mechatronics", category: "Accessories", subcategory: "Interface", name: "Eurosens Dock", connectivity: "RS485", platform: "Universal", features: "Standard fuel sensor signal converter; Digital RS485 interface; Vehicle integration; Signal processing; Easy installation", status: "Standard", price_range: "Mid", use_case: "Signal Conversion" },
+            { company: "Mechatronics", category: "Accessories", subcategory: "Interface", name: "Eurosens Dash", connectivity: "RS485/Analog", platform: "Universal", features: "Fuel level indicator adapter; Dashboard integration; Eurosens Dominator compatible; Vehicle instrument panel; Real-time display", status: "Standard", price_range: "Mid", use_case: "Dashboard Integration" },
+            { company: "Mechatronics", category: "Accessories", subcategory: "Display", name: "Eurosens Display RS", connectivity: "RS485", platform: "Universal", features: "On-site information display; Fuel level and consumption data; Direct sensor connection; Real-time monitoring; Driver information", status: "Standard", price_range: "Mid", use_case: "Driver Information" },
+            { company: "Mechatronics", category: "Accessories", subcategory: "Controller", name: "Eurosens Tank Manager", connectivity: "RS485/Ethernet", platform: "Universal", features: "Fuel tank management system; Multiple sensor support; Data logging; Alert management; Network connectivity", status: "Standard", price_range: "Premium", use_case: "Tank Management" },
+            { company: "Mechatronics", category: "Accessories", subcategory: "Monitor", name: "Eurosens Monitor", connectivity: "RS485", platform: "Universal", features: "Fuel monitoring station; Real-time data visualization; Multi-sensor support; Alert system; Comprehensive monitoring", status: "Standard", price_range: "Premium", use_case: "Monitoring Station" },
+            { company: "Mechatronics", category: "Accessories", subcategory: "Equipment", name: "Eurosens Deaerator", connectivity: "Mechanical", platform: "Universal", features: "Fuel deaeration system; Air bubble removal; Flow measurement accuracy; System optimization; Mechanical integration", status: "Standard", price_range: "Mid", use_case: "Flow Optimization" },
+            
+            // OWEN Products (Estimated based on typical industrial automation products)
+            { company: "Owen", category: "Tracker", subcategory: "Industrial", name: "Owen GPS-I", connectivity: "4G", platform: "Owen", features: "Industrial GPS tracker; Extreme temperature operation; Vibration resistant; Multiple I/O", status: "Standard", price_range: "Premium", use_case: "Industrial Tracking" },
+            { company: "Owen", category: "Accessories", subcategory: "Temperature Sensor", name: "Owen TRM", connectivity: "RS485", platform: "Owen", features: "Industrial temperature sensor; High accuracy; Wide temperature range; Modbus protocol", status: "Standard", price_range: "Mid", use_case: "Industrial Temperature" },
+            { company: "Owen", category: "Accessories", subcategory: "Controller", name: "Owen PLK", connectivity: "Ethernet", platform: "Owen", features: "Programmable logic controller; Industrial automation; Multiple protocols; Robust design", status: "Standard", price_range: "Premium", use_case: "Industrial Control" },
+            { company: "Owen", category: "Accessories", subcategory: "Interface", name: "Owen AC", connectivity: "RS485", platform: "Owen", features: "Interface converter; Protocol conversion; Industrial grade; Easy configuration", status: "Standard", price_range: "Mid", use_case: "Protocol Conversion" },
+            { company: "Owen", category: "Accessories", subcategory: "Power Supply", name: "Owen PS", connectivity: "Wired", platform: "Owen", features: "Industrial power supply; Wide input range; High efficiency; Compact design", status: "Standard", price_range: "Mid", use_case: "Industrial Power" }
+        ];
+
+        function generateMasterExcel() {
+            const wb = XLSX.utils.book_new();
+            
+            // Sheet 1: Master Inventory
+            const ws1 = XLSX.utils.json_to_sheet(inventoryData);
+            XLSX.utils.book_append_sheet(wb, ws1, "Master Inventory");
+            
+            // Sheet 2: Company Summary
+            const companyStats = calculateCompanyStats();
+            const ws2 = XLSX.utils.json_to_sheet(companyStats);
+            XLSX.utils.book_append_sheet(wb, ws2, "Company Analysis");
+            
+            // Sheet 3: Category Breakdown
+            const categoryStats = calculateCategoryBreakdown();
+            const ws3 = XLSX.utils.json_to_sheet(categoryStats);
+            XLSX.utils.book_append_sheet(wb, ws3, "Category Breakdown");
+            
+            // Sheet 4: Subcategory Analysis
+            const subcategoryStats = calculateSubcategoryStats();
+            const ws4 = XLSX.utils.json_to_sheet(subcategoryStats);
+            XLSX.utils.book_append_sheet(wb, ws4, "Subcategory Analysis");
+            
+            // Sheet 5: Connectivity Analysis
+            const connectivityStats = calculateConnectivityStats();
+            const ws5 = XLSX.utils.json_to_sheet(connectivityStats);
+            XLSX.utils.book_append_sheet(wb, ws5, "Connectivity Analysis");
+            
+            // Sheet 6: Price Range Analysis
+            const priceStats = calculatePriceStats();
+            const ws6 = XLSX.utils.json_to_sheet(priceStats);
+            XLSX.utils.book_append_sheet(wb, ws6, "Price Analysis");
+            
+            // Sheet 7: Use Case Analysis
+            const useCaseStats = calculateUseCaseStats();
+            const ws7 = XLSX.utils.json_to_sheet(useCaseStats);
+            XLSX.utils.book_append_sheet(wb, ws7, "Use Case Analysis");
+            
+            // Sheet 8: Platform Integration
+            const platformData = [
+                { Platform: "Naturelink Platform", Compatible_Companies: "Teltonika, Naturelink Tech, Mechatronics, Owen", Integration_Level: "Full" },
+                { Platform: "Uffizio Trackzee", Compatible_Companies: "Teltonika, Naturelink Tech, Mechatronics, Owen", Integration_Level: "Full" },
+                { Platform: "Wialon", Compatible_Companies: "Teltonika, Naturelink Tech, Mechatronics, Owen", Integration_Level: "Full" }
+            ];
+            const ws8 = XLSX.utils.json_to_sheet(platformData);
+            XLSX.utils.book_append_sheet(wb, ws8, "Platform Integration");
+            
+            // Sheet 9: Stock Planning Template
+            const stockTemplate = inventoryData.map(item => ({
+                Company: item.company,
+                Category: item.category,
+                Subcategory: item.subcategory,
+                Product_Name: item.name,
+                Current_Stock: 0,
+                Min_Stock_Level: 0,
+                Max_Stock_Level: 0,
+                Reorder_Point: 0,
+                Supplier_Lead_Time: 0,
+                Unit_Cost: 0,
+                Last_Order_Date: "",
+                Next_Order_Date: "",
+                Status: "Planning"
+            }));
+            const ws9 = XLSX.utils.json_to_sheet(stockTemplate);
+            XLSX.utils.book_append_sheet(wb, ws9, "Stock Planning Template");
+            
+            XLSX.writeFile(wb, "Trucksoft_Telematics_Master_Inventory.xlsx");
+        }
+        
+        function generateCategoryReport() {
+            const wb = XLSX.utils.book_new();
+            
+            // Trackers Analysis
+            const trackers = inventoryData.filter(item => item.category === "Tracker");
+            const ws1 = XLSX.utils.json_to_sheet(trackers);
+            XLSX.utils.book_append_sheet(wb, ws1, "Trackers");
+            
+            // Video Telematics Analysis
+            const video = inventoryData.filter(item => item.category === "Video Telematics");
+            const ws2 = XLSX.utils.json_to_sheet(video);
+            XLSX.utils.book_append_sheet(wb, ws2, "Video Telematics");
+            
+            // Fuel Sensors Analysis
+            const fuel = inventoryData.filter(item => item.category === "Fuel Sensor");
+            const ws3 = XLSX.utils.json_to_sheet(fuel);
+            XLSX.utils.book_append_sheet(wb, ws3, "Fuel Sensors");
+            
+            // Accessories Analysis
+            const accessories = inventoryData.filter(item => item.category === "Accessories");
+            const ws4 = XLSX.utils.json_to_sheet(accessories);
+            XLSX.utils.book_append_sheet(wb, ws4, "Accessories");
+            
+            // Category Summary
+            const categoryOverview = [
+                { Category: "Tracker", Total_Products: trackers.length, Companies: [...new Set(trackers.map(i => i.company))].join(", "), Subcategories: [...new Set(trackers.map(i => i.subcategory))].length },
+                { Category: "Video Telematics", Total_Products: video.length, Companies: [...new Set(video.map(i => i.company))].join(", "), Subcategories: [...new Set(video.map(i => i.subcategory))].length },
+                { Category: "Fuel Sensor", Total_Products: fuel.length, Companies: [...new Set(fuel.map(i => i.company))].join(", "), Subcategories: [...new Set(fuel.map(i => i.subcategory))].length },
+                { Category: "Accessories", Total_Products: accessories.length, Companies: [...new Set(accessories.map(i => i.company))].join(", "), Subcategories: [...new Set(accessories.map(i => i.subcategory))].length }
+            ];
+            const ws5 = XLSX.utils.json_to_sheet(categoryOverview);
+            XLSX.utils.book_append_sheet(wb, ws5, "Category Overview");
+            
+            XLSX.writeFile(wb, "Trucksoft_Category_Analysis_Report.xlsx");
+        }
+        
+        function generatePartnerReport() {
+            const wb = XLSX.utils.book_new();
+            
+            // Individual Partner Sheets
+            const companies = [...new Set(inventoryData.map(item => item.company))];
+            companies.forEach(company => {
+                const companyData = inventoryData.filter(item => item.company === company);
+                const ws = XLSX.utils.json_to_sheet(companyData);
+                XLSX.utils.book_append_sheet(wb, ws, company.replace(/\s+/g, '_'));
+            });
+            
+            // Partner Comparison
+            const partnerComparison = companies.map(company => {
+                const companyProducts = inventoryData.filter(item => item.company === company);
+                return {
+                    Partner: company,
+                    Total_Products: companyProducts.length,
+                    Categories: [...new Set(companyProducts.map(i => i.category))].join(", "),
+                    Subcategories_Count: [...new Set(companyProducts.map(i => i.subcategory))].length,
+                    Price_Range_Coverage: [...new Set(companyProducts.map(i => i.price_range))].join(", "),
+                    Connectivity_Options: [...new Set(companyProducts.map(i => i.connectivity))].join(", "),
+                    Primary_Strengths: getPrimaryStrengths(company)
+                };
+            });
+            const ws_comparison = XLSX.utils.json_to_sheet(partnerComparison);
+            XLSX.utils.book_append_sheet(wb, ws_comparison, "Partner Comparison");
+            
+            XLSX.writeFile(wb, "Trucksoft_Partner_Comparison_Report.xlsx");
+        }
+        
+        function getPrimaryStrengths(company) {
+            switch(company) {
+                case "Teltonika": return "Complete GPS tracking solutions, Wide product range, Global support";
+                case "Naturelink Tech": return "Advanced fleet management, Video telematics, AI integration";
+                case "Mechatronics": return "Fuel monitoring specialists, Industrial sensors, High accuracy";
+                case "Owen": return "Industrial automation, Extreme conditions, Robust design";
+                default: return "Specialized solutions";
+            }
+        }
+        
+        function calculateCompanyStats() {
+            const companies = {};
+            inventoryData.forEach(item => {
+                if (!companies[item.company]) {
+                    companies[item.company] = { 
+                        company: item.company, 
+                        total_products: 0, 
+                        categories: new Set(), 
+                        subcategories: new Set(),
+                        connectivity_types: new Set(),
+                        price_ranges: new Set()
+                    };
+                }
+                companies[item.company].total_products++;
+                companies[item.company].categories.add(item.category);
+                companies[item.company].subcategories.add(item.subcategory);
+                companies[item.company].connectivity_types.add(item.connectivity);
+                companies[item.company].price_ranges.add(item.price_range);
+            });
+            
+            return Object.values(companies).map(comp => ({
+                Company: comp.company,
+                Total_Products: comp.total_products,
+                Categories_Count: comp.categories.size,
+                Categories: [...comp.categories].join(", "),
+                Subcategories_Count: comp.subcategories.size,
+                Connectivity_Types: [...comp.connectivity_types].join(", "),
+                Price_Ranges: [...comp.price_ranges].join(", "),
+                Market_Share: ((comp.total_products / inventoryData.length) * 100).toFixed(1) + "%"
+            })).sort((a, b) => b.Total_Products - a.Total_Products);
+        }
+        
+        function calculateCategoryBreakdown() {
+            const categories = {};
+            inventoryData.forEach(item => {
+                const key = item.category;
+                if (!categories[key]) {
+                    categories[key] = { 
+                        category: key, 
+                        count: 0, 
+                        companies: new Set(),
+                        subcategories: new Set(),
+                        price_ranges: new Set()
+                    };
+                }
+                categories[key].count++;
+                categories[key].companies.add(item.company);
+                categories[key].subcategories.add(item.subcategory);
+                categories[key].price_ranges.add(item.price_range);
+            });
+            
+            return Object.values(categories).map(cat => ({
+                Category: cat.category,
+                Total_Products: cat.count,
+                Percentage: ((cat.count / inventoryData.length) * 100).toFixed(1) + "%",
+                Companies: [...cat.companies].join(", "),
+                Subcategories: [...cat.subcategories].join(", "),
+                Price_Range_Coverage: [...cat.price_ranges].join(", ")
+            })).sort((a, b) => b.Total_Products - a.Total_Products);
+        }
+        
+        function calculateSubcategoryStats() {
+            const subcategories = {};
+            inventoryData.forEach(item => {
+                const key = `${item.category} - ${item.subcategory}`;
+                if (!subcategories[key]) {
+                    subcategories[key] = { 
+                        category: item.category,
+                        subcategory: item.subcategory,
+                        count: 0, 
+                        companies: new Set()
+                    };
+                }
+                subcategories[key].count++;
+                subcategories[key].companies.add(item.company);
+            });
+            
+            return Object.values(subcategories).map(sub => ({
+                Category: sub.category,
+                Subcategory: sub.subcategory,
+                Product_Count: sub.count,
+                Companies: [...sub.companies].join(", "),
+                Company_Count: sub.companies.size
+            })).sort((a, b) => b.Product_Count - a.Product_Count);
+        }
+        
+        function calculateConnectivityStats() {
+            const connectivity = {};
+            inventoryData.forEach(item => {
+                connectivity[item.connectivity] = (connectivity[item.connectivity] || 0) + 1;
+            });
+            
+            return Object.entries(connectivity).map(([type, count]) => ({
+                Connectivity_Type: type,
+                Product_Count: count,
+                Percentage: ((count / inventoryData.length) * 100).toFixed(1) + "%",
+                Use_Cases: getConnectivityUseCases(type)
+            })).sort((a, b) => b.Product_Count - a.Product_Count);
+        }
+        
+        function getConnectivityUseCases(type) {
+            switch(type) {
+                case "4G": return "High-speed data, Real-time tracking, Video streaming";
+                case "2G": return "Basic tracking, Cost-effective, Wide coverage";
+                case "M1": return "IoT applications, Low power, Extended coverage";
+                case "Bluetooth": return "Short-range sensors, Easy pairing, Low power";
+                case "RS485": return "Industrial applications, Wired sensors, Reliable";
+                case "Battery": return "Portable devices, Asset tracking, Autonomous";
+                default: return "Various applications";
+            }
+        }
+        
+        function calculatePriceStats() {
+            const prices = {};
+            inventoryData.forEach(item => {
+                prices[item.price_range] = (prices[item.price_range] || 0) + 1;
+            });
+            
+            return Object.entries(prices).map(([range, count]) => ({
+                Price_Range: range,
+                Product_Count: count,
+                Percentage: ((count / inventoryData.length) * 100).toFixed(1) + "%",
+                Target_Market: getPriceTargetMarket(range)
+            }));
+        }
+        
+        function getPriceTargetMarket(range) {
+            switch(range) {
+                case "Budget": return "Small fleets, Basic tracking needs";
+                case "Mid": return "Medium businesses, Standard features";
+                case "Premium": return "Advanced features, Professional use";
+                case "Enterprise": return "Large fleets, Complex requirements";
+                default: return "Various segments";
+            }
+        }
+        
+        function calculateUseCaseStats() {
+            const useCases = {};
+            inventoryData.forEach(item => {
+                useCases[item.use_case] = (useCases[item.use_case] || 0) + 1;
+            });
+            
+            return Object.entries(useCases).map(([useCase, count]) => ({
+                Use_Case: useCase,
+                Product_Count: count,
+                Percentage: ((count / inventoryData.length) * 100).toFixed(1) + "%"
+            })).sort((a, b) => b.Product_Count - a.Product_Count);
+        }
+        
+        function createPreviewTable() {
+            // Show a sample of products from each company
+            const previewData = [];
+            const companies = [...new Set(inventoryData.map(item => item.company))];
+            companies.forEach(company => {
+                const companyProducts = inventoryData.filter(item => item.company === company);
+                previewData.push(...companyProducts.slice(0, 3)); // 3 products per company
+            });
+            
+            let tableHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th>Category</th>
+                            <th>Subcategory</th>
+                            <th>Product Name</th>
+                            <th>Connectivity</th>
+                            <th>Price Range</th>
+                            <th>Use Case</th>
+                            <th>Key Features</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            previewData.forEach(item => {
+                const companyClass = item.company.toLowerCase().replace(/\s+/g, '').replace(/[^a-z]/g, '');
+                const categoryClass = item.category.toLowerCase().replace(/\s+/g, '-');
+                const shortFeatures = item.features.substring(0, 80) + (item.features.length > 80 ? '...' : '');
+                
+                tableHTML += `
+                    <tr>
+                        <td><span class="company-badge ${companyClass}">${item.company}</span></td>
+                        <td><span class="category-badge ${categoryClass}">${item.category}</span></td>
+                        <td><strong>${item.subcategory}</strong></td>
+                        <td><strong>${item.name}</strong></td>
+                        <td>${item.connectivity}</td>
+                        <td>${item.price_range}</td>
+                        <td>${item.use_case}</td>
+                        <td class="feature-list">${shortFeatures}</td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += '</tbody></table>';
+            document.getElementById('tableContainer').innerHTML = tableHTML;
+        }
+        
+        // Initialize preview table on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPersistedData();
+            createPreviewTable();
+            updateStats();
+        });
+        
+        function updateStats() {
+            document.getElementById('totalProducts').textContent = inventoryData.length;
+        }
+        
+        // ============ DEVICE SYNCHRONIZATION SYSTEM ============
+        
+        // Company website configurations
+        const companyConfigs = {
+            teltonika: {
+                name: 'Teltonika',
+                url: 'https://www.teltonika-gps.com/',
+                productPagesUrls: [
+                    'https://www.teltonika-gps.com/products/trackers',
+                    'https://www.teltonika-gps.com/products/video-telematics',
+                    'https://www.teltonika-gps.com/products/accessories'
+                ],
+                category: 'Multiple',
+                lastSync: null,
+                totalFound: 0
+            },
+            naturelink: {
+                name: 'Naturelink Tech',
+                url: 'https://naturelinktech.com/product',
+                productPagesUrls: [
+                    'https://naturelinktech.com/product#vehicle-gnss-tracker',
+                    'https://naturelinktech.com/product#ai-dashcam',
+                    'https://naturelinktech.com/product#mobile-dvr',
+                    'https://naturelinktech.com/product#cameras'
+                ],
+                category: 'Multiple',
+                lastSync: null,
+                totalFound: 0
+            },
+            eurosens: {
+                name: 'Eurosens (Mechatronics)',
+                url: 'https://eurosenstelematics.com/en/home-page/products',
+                productPagesUrls: [
+                    'https://eurosenstelematics.com/categories/datchiki-urovnia-topliva/',
+                    'https://eurosenstelematics.com/categories/kontrol-rashoda-topliva/',
+                    'https://eurosenstelematics.com/categories/kontrol-nagruzki-na-os/',
+                    'https://eurosenstelematics.com/categories/bortovie-displei/'
+                ],
+                category: 'Fuel Sensor',
+                lastSync: null,
+                totalFound: 0
+            }
+        };
+        
+        // Store for discovered devices
+        let discoveredDevices = [];
+        let selectedDevices = [];
+        let syncHistory = JSON.parse(localStorage.getItem('syncHistory') || '[]');
+        
+        // Main sync function for individual companies
+        async function syncCompanyData(companyKey) {
+            const config = companyConfigs[companyKey];
+            if (!config) return;
+            
+            updateSyncStatus(companyKey, 'syncing', 'Scanning website for new devices...');
+            
+            try {
+                // Simulate web scraping (in real implementation, this would use a backend service)
+                const newDevices = await simulateWebScraping(companyKey, config);
+                
+                // Filter out devices that already exist
+                const trulyNewDevices = filterNewDevices(newDevices, companyKey);
+                
+                // Update sync status
+                config.lastSync = new Date();
+                config.totalFound = trulyNewDevices.length;
+                
+                if (trulyNewDevices.length > 0) {
+                    updateSyncStatus(companyKey, 'success', `Found ${trulyNewDevices.length} new devices!`);
+                    discoveredDevices.push(...trulyNewDevices);
+                    showSyncResults();
+                } else {
+                    updateSyncStatus(companyKey, 'success', 'No new devices found. Inventory is up to date.');
+                }
+                
+                // Save sync history
+                saveSyncHistory(companyKey, trulyNewDevices.length);
+                
+            } catch (error) {
+                updateSyncStatus(companyKey, 'error', 'Sync failed. Please try again.');
+                console.error('Sync error:', error);
+            }
+        }
+        
+        // Simulate web scraping (In production, this would call your backend API)
+        async function simulateWebScraping(companyKey, config) {
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 3000));
+            
+            const mockNewDevices = {
+                teltonika: [
+                    {
+                        company: "Teltonika",
+                        category: "Tracker",
+                        subcategory: "Advanced",
+                        name: "FMC300",
+                        connectivity: "4G LTE",
+                        platform: "FMC",
+                        features: "Next-gen fleet tracking; AI-powered analytics; Enhanced security; Multi-platform support",
+                        status: "New",
+                        price_range: "Premium",
+                        use_case: "AI Fleet Management",
+                        source_url: config.url,
+                        discovered_date: new Date().toISOString()
+                    },
+                    {
+                        company: "Teltonika",
+                        category: "Video Telematics",
+                        subcategory: "AI Camera",
+                        name: "DualCam Pro AI",
+                        connectivity: "4G LTE",
+                        platform: "Teltonika",
+                        features: "Dual camera system; Real-time AI analysis; Driver behavior monitoring; Cloud integration",
+                        status: "New",
+                        price_range: "Premium",
+                        use_case: "AI Video Analytics",
+                        source_url: config.url,
+                        discovered_date: new Date().toISOString()
+                    }
+                ],
+                naturelink: [
+                    // Vehicle GNSS Trackers
+                    {
+                        company: "Naturelink Tech",
+                        category: "Tracker",
+                        subcategory: "GNSS Vehicle Tracker",
+                        name: "NL05",
+                        connectivity: "4G LTE Dual SIM",
+                        platform: "Naturelink",
+                        features: "Compact and intelligent 4G GNSS tracker; Dual SIM support; Robust 4G connectivity; Proactive security; Continuous communication in all conditions",
+                        status: "New",
+                        price_range: "Premium",
+                        use_case: "Advanced Vehicle Tracking",
+                        source_url: config.url,
+                        discovered_date: new Date().toISOString()
+                    },
+                    // AI Dashcam Products
+                    {
+                        company: "Naturelink Tech",
+                        category: "Video Telematics",
+                        subcategory: "AI Dashcam",
+                        name: "NL13",
+                        connectivity: "4G & WiFi",
+                        platform: "Naturelink",
+                        features: "New generation AI Dashcam; Built-in front and rear camera; Self-calibration for DMS and ADAS; Easy installation; Reduced time and labor cost",
+                        status: "New",
+                        price_range: "Mid",
+                        use_case: "Affordable AI Video Monitoring",
+                        source_url: config.url,
+                        discovered_date: new Date().toISOString()
+                    },
+                    {
+                        company: "Naturelink Tech",
+                        category: "Video Telematics",
+                        subcategory: "AI Dashcam",
+                        name: "NL16",
+                        connectivity: "4G & WiFi",
+                        platform: "Naturelink",
+                        features: "Next Generation high-end AI Dashcam; Integrated HD video recording; Front and rear dual-lens; Extendable to two additional AHD cameras",
+                        status: "New",
+                        price_range: "Premium",
+                        use_case: "High-End AI Video Recording",
+                        source_url: config.url,
+                        discovered_date: new Date().toISOString()
+                    },
+                    // Mobile DVR Products
+                    {
+                        company: "Naturelink Tech",
+                        category: "Video Telematics",
+                        subcategory: "Mobile DVR",
+                        name: "NL15",
+                        connectivity: "4G LTE",
+                        platform: "Naturelink",
+                        features: "IP67 AI MDVR; Integrated video monitoring; DSM, ADAS and BSD functions; Advanced AI technology; Fleet safety protection",
+                        status: "New",
+                        price_range: "Premium",
+                        use_case: "4CH IP67 AI Mobile DVR",
+                        source_url: config.url,
+                        discovered_date: new Date().toISOString()
+                    },
+                    {
+                        company: "Naturelink Tech",
+                        category: "Video Telematics",
+                        subcategory: "Mobile DVR",
+                        name: "NL30",
+                        connectivity: "4G LTE",
+                        platform: "Naturelink",
+                        features: "Cutting-edge high-definition intelligent AI mobile DVR; 6CH capacity; Advanced video processing; Fleet management integration",
+                        status: "New",
+                        price_range: "Enterprise",
+                        use_case: "6CH AI Mobile DVR",
+                        source_url: config.url,
+                        discovered_date: new Date().toISOString()
+                    },
+                    // Camera Products
+                    {
+                        company: "Naturelink Tech",
+                        category: "Accessories",
+                        subcategory: "Cameras",
+                        name: "NL-CA06",
+                        connectivity: "Wired AHD",
+                        platform: "Naturelink",
+                        features: "Outdoor front view camera; 1080P/720P resolution; High-performance 2MP CMOS sensor; Smart IR CUT for Day&Night mode; Excellent picture quality",
+                        status: "New",
+                        price_range: "Budget",
+                        use_case: "Front View Camera",
+                        source_url: config.url,
+                        discovered_date: new Date().toISOString()
+                    },
+                    {
+                        company: "Naturelink Tech",
+                        category: "Accessories",
+                        subcategory: "Cameras",
+                        name: "NL-PC01",
+                        connectivity: "4G LTE",
+                        platform: "Naturelink",
+                        features: "High accuracy people counting camera; Built-in AI algorithm; Bus fleet management; Station people statistics; Smart passenger monitoring",
+                        status: "New",
+                        price_range: "Premium",
+                        use_case: "Passenger Counter",
+                        source_url: config.url,
+                        discovered_date: new Date().toISOString()
+                    }
+                ],
+                eurosens: [
+                    // New Level Sensors
+                    {
+                        company: "Mechatronics",
+                        category: "Fuel Sensor",
+                        subcategory: "Level Sensors",
+                        name: "Eurosens Dominator Pro",
+                        connectivity: "RS485/CAN/Bluetooth",
+                        platform: "Universal",
+                        features: "Next-gen modular capacitive sensor; Multi-interface support; Enhanced accuracy; Remote configuration; Advanced diagnostics",
+                        status: "New",
+                        price_range: "Premium",
+                        use_case: "Advanced Fuel Level Monitoring",
+                        source_url: config.url,
+                        discovered_date: new Date().toISOString()
+                    },
+                    // New Flow Meters
+                    {
+                        company: "Mechatronics",
+                        category: "Fuel Sensor",
+                        subcategory: "Flow Meters",
+                        name: "Eurosens Delta Pro",
+                        connectivity: "RS485/CAN",
+                        platform: "Universal",
+                        features: "Advanced differential flow measurement; Enhanced precision; Multi-fuel compatibility; Real-time diagnostics; Temperature compensation",
+                        status: "New",
+                        price_range: "Enterprise",
+                        use_case: "Professional Fuel Flow Monitoring",
+                        source_url: config.url,
+                        discovered_date: new Date().toISOString()
+                    },
+                    // New Onboard Weighing
+                    {
+                        company: "Mechatronics",
+                        category: "Accessories",
+                        subcategory: "Weighing Systems",
+                        name: "Eurosens Difference Pro",
+                        connectivity: "RS485/CAN",
+                        platform: "Universal",
+                        features: "Universal onboard weighing system; Axle load control; Mass monitoring; Overload prevention; Real-time weight assessment",
+                        status: "New",
+                        price_range: "Premium",
+                        use_case: "Onboard Weighing",
+                        source_url: config.url,
+                        discovered_date: new Date().toISOString()
+                    }
+                ]
+            };
+            
+            return mockNewDevices[companyKey] || [];
+        }
+        
+        // Filter devices that don't already exist in inventory
+        function filterNewDevices(newDevices, companyKey) {
+            return newDevices.filter(newDevice => {
+                return !inventoryData.some(existing => 
+                    existing.company.toLowerCase().includes(newDevice.company.toLowerCase()) && 
+                    existing.name === newDevice.name
+                );
+            });
+        }
+        
+        // Update sync status UI
+        function updateSyncStatus(companyKey, status, message) {
+            const indicator = document.getElementById(`${companyKey}-indicator`);
+            const statusDiv = document.getElementById(`${companyKey}-status`);
+            const syncBtn = document.getElementById(`${companyKey}-sync-btn`);
+            
+            // Update indicator
+            indicator.className = `sync-indicator ${status}`;
+            
+            // Update status message
+            statusDiv.className = `sync-status status-${status}`;
+            statusDiv.textContent = message;
+            
+            // Update button state
+            if (status === 'syncing') {
+                syncBtn.disabled = true;
+                syncBtn.textContent = '🔄 Syncing...';
+            } else {
+                syncBtn.disabled = false;
+                syncBtn.textContent = `🔄 Sync ${companyConfigs[companyKey].name}`;
+            }
+        }
+        
+        // Show sync results
+        function showSyncResults() {
+            const resultsDiv = document.getElementById('sync-results');
+            const summaryDiv = document.getElementById('sync-summary');
+            const gridDiv = document.getElementById('new-devices-grid');
+            const addBtn = document.getElementById('add-selected-btn');
+            
+            if (discoveredDevices.length === 0) {
+                resultsDiv.classList.remove('show');
+                return;
+            }
+            
+            // Update summary
+            const totalNew = discoveredDevices.length;
+            const companies = [...new Set(discoveredDevices.map(d => d.company))];
+            summaryDiv.innerHTML = `
+                <div style="background: #f0f9ff; padding: 20px; border-radius: 12px; border-left: 4px solid #0ea5e9;">
+                    <h4 style="margin: 0 0 10px 0; color: #0c4a6e;">🆕 Sync Summary</h4>
+                    <p style="margin: 0; color: #0369a1;"><strong>${totalNew}</strong> new devices discovered from <strong>${companies.length}</strong> companies: ${companies.join(', ')}</p>
+                </div>
+            `;
+            
+            // Render device cards
+            gridDiv.innerHTML = discoveredDevices.map((device, index) => `
+                <div class="device-card" data-index="${index}" onclick="toggleDeviceSelection(${index})">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                        <div>
+                            <h4 style="margin: 0 0 5px 0; color: #1e293b;">${device.name}</h4>
+                            <span class="company-badge ${device.company.toLowerCase().replace(/\s+/g, '').replace(/[^a-z]/g, '')}">${device.company}</span>
+                        </div>
+                        <input type="checkbox" id="device-${index}" style="transform: scale(1.2);">
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="category-badge ${device.category.toLowerCase().replace(/\s+/g, '-')}">${device.category}</span>
+                        <strong style="margin-left: 10px;">${device.subcategory}</strong>
+                    </div>
+                    <p style="color: #64748b; font-size: 0.9em; margin: 10px 0;"><strong>Connectivity:</strong> ${device.connectivity}</p>
+                    <p style="color: #64748b; font-size: 0.9em; margin: 10px 0;"><strong>Use Case:</strong> ${device.use_case}</p>
+                    <p style="color: #64748b; font-size: 0.85em; line-height: 1.4;">${device.features.substring(0, 120)}${device.features.length > 120 ? '...' : ''}</p>
+                </div>
+            `).join('');
+            
+            resultsDiv.classList.add('show');
+            addBtn.style.display = 'block';
+        }
+        
+        // Toggle device selection
+        function toggleDeviceSelection(index) {
+            const card = document.querySelector(`[data-index="${index}"]`);
+            const checkbox = document.getElementById(`device-${index}`);
+            
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                card.classList.add('selected');
+                if (!selectedDevices.includes(index)) {
+                    selectedDevices.push(index);
+                }
+            } else {
+                card.classList.remove('selected');
+                selectedDevices = selectedDevices.filter(i => i !== index);
+            }
+            
+            // Update button text
+            const addBtn = document.getElementById('add-selected-btn');
+            addBtn.textContent = selectedDevices.length > 0 
+                ? `➕ Add ${selectedDevices.length} Selected Device${selectedDevices.length > 1 ? 's' : ''} to Inventory`
+                : '➕ Add Selected Devices to Inventory';
+        }
+        
+        // Add selected devices to inventory
+        function addSelectedDevices() {
+            if (selectedDevices.length === 0) {
+                alert('Please select at least one device to add.');
+                return;
+            }
+            
+            const devicesToAdd = selectedDevices.map(index => discoveredDevices[index]);
+            
+            // Add to inventory
+            inventoryData.push(...devicesToAdd);
+            
+            // Update UI
+            updateStats();
+            createPreviewTable();
+            
+            // Clear selections
+            selectedDevices = [];
+            discoveredDevices = discoveredDevices.filter((_, index) => !selectedDevices.includes(index));
+            
+            // Hide results if no more devices
+            if (discoveredDevices.length === 0) {
+                document.getElementById('sync-results').classList.remove('show');
+            } else {
+                showSyncResults();
+            }
+            
+            // Show success message
+            alert(`Successfully added ${devicesToAdd.length} new device${devicesToAdd.length > 1 ? 's' : ''} to inventory!`);
+            
+            // Save to localStorage for persistence
+            localStorage.setItem('inventoryData', JSON.stringify(inventoryData));
+        }
+        
+        // Sync all companies
+        async function syncAllCompanies() {
+            const companies = Object.keys(companyConfigs);
+            const syncAllBtn = document.getElementById('sync-all-btn');
+            
+            syncAllBtn.disabled = true;
+            syncAllBtn.textContent = '⚡ Syncing All...';
+            
+            for (const company of companies) {
+                await syncCompanyData(company);
+                // Small delay between companies
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            
+            syncAllBtn.disabled = false;
+            syncAllBtn.textContent = '⚡ Sync All Companies';
+        }
+        
+        // View company products
+        function viewCompanyProducts(companyKey) {
+            const config = companyConfigs[companyKey];
+            let companyProducts;
+            
+            // Handle different company name variations
+            if (companyKey === 'eurosens') {
+                companyProducts = inventoryData.filter(device => 
+                    device.company.toLowerCase().includes('mechatronics') || 
+                    device.company.toLowerCase().includes('eurosens')
+                );
+            } else {
+                companyProducts = inventoryData.filter(device => 
+                    device.company.toLowerCase().includes(config.name.toLowerCase().split(' ')[0])
+                );
+            }
+            
+            if (companyProducts.length === 0) {
+                alert(`No ${config.name} products found in current inventory.`);
+                return;
+            }
+            
+            // Create a temporary table view
+            const popup = window.open('', '_blank', 'width=1200,height=800');
+            popup.document.write(`
+                <html>
+                <head>
+                    <title>${config.name} Products</title>
+                    <style>
+                        body { font-family: 'Inter', sans-serif; padding: 20px; background: #f8fafc; }
+                        h1 { color: #1e293b; }
+                        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+                        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+                        th { background: #4f46e5; color: white; font-weight: 600; }
+                        tr:hover { background: #f1f5f9; }
+                        .company-badge { padding: 4px 8px; border-radius: 12px; font-size: 0.8em; font-weight: bold; }
+                        .teltonika { background: #3b82f6; color: white; }
+                        .naturelinktech { background: #10b981; color: white; }
+                        .mechatronics { background: #ef4444; color: white; }
+                    </style>
+                </head>
+                <body>
+                    <h1>${config.name} Products (${companyProducts.length} items)</h1>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Subcategory</th>
+                                <th>Connectivity</th>
+                                <th>Price Range</th>
+                                <th>Use Case</th>
+                                <th>Features</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${companyProducts.map(product => `
+                                <tr>
+                                    <td><strong>${product.name}</strong></td>
+                                    <td><span class="company-badge ${product.company.toLowerCase().replace(/\s+/g, '').replace(/[^a-z]/g, '')}">${product.category}</span></td>
+                                    <td>${product.subcategory}</td>
+                                    <td>${product.connectivity}</td>
+                                    <td>${product.price_range}</td>
+                                    <td>${product.use_case}</td>
+                                    <td style="max-width: 300px; word-wrap: break-word;">${product.features.substring(0, 100)}${product.features.length > 100 ? '...' : ''}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </body>
+                </html>
+            `);
+        }
+        
+        // Save sync history
+        function saveSyncHistory(companyKey, devicesFound) {
+            const historyEntry = {
+                company: companyConfigs[companyKey].name,
+                timestamp: new Date().toISOString(),
+                devicesFound: devicesFound,
+                success: true
+            };
+            
+            syncHistory.unshift(historyEntry);
+            
+            // Keep only last 50 entries
+            if (syncHistory.length > 50) {
+                syncHistory = syncHistory.slice(0, 50);
+            }
+            
+            localStorage.setItem('syncHistory', JSON.stringify(syncHistory));
+        }
+        
+        // Show sync history
+        function showSyncHistory() {
+            if (syncHistory.length === 0) {
+                alert('No sync history available.');
+                return;
+            }
+            
+            const popup = window.open('', '_blank', 'width=800,height=600');
+            popup.document.write(`
+                <html>
+                <head>
+                    <title>Sync History</title>
+                    <style>
+                        body { font-family: 'Inter', sans-serif; padding: 20px; background: #f8fafc; }
+                        h1 { color: #1e293b; }
+                        .history-item { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+                        .timestamp { color: #64748b; font-size: 0.9em; }
+                        .company { font-weight: 600; color: #1e293b; }
+                        .devices-found { color: #059669; font-weight: 500; }
+                    </style>
+                </head>
+                <body>
+                    <h1>Synchronization History</h1>
+                    ${syncHistory.map(entry => `
+                        <div class="history-item">
+                            <div class="company">${entry.company}</div>
+                            <div class="timestamp">${new Date(entry.timestamp).toLocaleString()}</div>
+                            <div class="devices-found">${entry.devicesFound} new devices found</div>
+                        </div>
+                    `).join('')}
+                </body>
+                </html>
+            `);
+        }
+        
+        // Load persisted data on startup
+        function loadPersistedData() {
+            const saved = localStorage.getItem('inventoryData');
+            if (saved) {
+                try {
+                    const savedData = JSON.parse(saved);
+                    // Merge with existing data, avoiding duplicates
+                    savedData.forEach(device => {
+                        if (!inventoryData.some(existing => 
+                            existing.company === device.company && existing.name === device.name
+                        )) {
+                            inventoryData.push(device);
+                        }
+                    });
+                } catch (e) {
+                    console.error('Error loading persisted data:', e);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+                
