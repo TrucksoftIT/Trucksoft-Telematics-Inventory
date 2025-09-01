@@ -22,7 +22,7 @@ git add .
 
 echo.
 set /p message="Enter commit message (or press Enter for default): "
-if "%message%"=="" set message="Update: %date% %time%"
+if "%message%"=="" set "message=Update: %date% %time%"
 
 echo Step 2: Committing changes
 git commit -m "%message%"
