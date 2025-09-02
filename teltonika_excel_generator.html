@@ -338,6 +338,16 @@
             color: white;
             box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3);
         }
+        .howen { 
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed); 
+            color: white;
+            box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3);
+        }
+        .howentech { 
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed); 
+            color: white;
+            box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3);
+        }
         
         /* Enhanced Category Badges */
         .tracker { 
@@ -702,6 +712,125 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
+        
+        /* Partner Links Section */
+        .partner-links-section {
+            background: linear-gradient(135deg, #f8faff, #f1f5f9);
+            border: 2px solid #3b82f6;
+            padding: 30px;
+            border-radius: 20px;
+            margin: 40px 0;
+            position: relative;
+        }
+        
+        .partner-links-section::before {
+            content: '🌐';
+            position: absolute;
+            top: -15px;
+            left: 25px;
+            background: white;
+            padding: 8px 12px;
+            border-radius: 50%;
+            font-size: 1.3em;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .partner-links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+        
+        .partner-link-card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .partner-link-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.6s;
+        }
+        
+        .partner-link-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            text-decoration: none;
+        }
+        
+        .partner-link-card:hover::before {
+            left: 100%;
+        }
+        
+        .partner-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        .partner-link-card h4 {
+            color: #1e293b;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .partner-link-card p {
+            color: #64748b;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .visit-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .partner-link-card:hover .visit-btn {
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+            transform: translateX(4px);
+        }
+        
+        /* Partner-specific styling */
+        .teltonika-link:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.2);
+        }
+        
+        .naturelink-link:hover {
+            border-color: #10b981;
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.2);
+        }
+        
+        .howen-link:hover {
+            border-color: #8b5cf6;
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
+        }
+        
+        .eurosens-link:hover {
+            border-color: #f59e0b;
+            box-shadow: 0 20px 40px rgba(245, 158, 11, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -713,7 +842,7 @@
                 <div class="partner-badge">Teltonika</div>
                 <div class="partner-badge">Naturelink Tech</div>
                 <div class="partner-badge">Mechatronics</div>
-                <div class="partner-badge">Owen</div>
+                <div class="partner-badge">Howen Tech</div>
             </div>
         </div>
         
@@ -750,6 +879,41 @@
                 <div class="platform-tag">Naturelink Platform</div>
                 <div class="platform-tag">Uffizio Trackzee</div>
                 <div class="platform-tag">Wialon</div>
+            </div>
+        </div>
+        
+        <div class="partner-links-section">
+            <h3 class="section-header">🌐 Partner Websites</h3>
+            <p style="color: #64748b; margin-bottom: 25px; font-size: 1.1em;">Visit our technology partners directly for detailed product specifications and support</p>
+            
+            <div class="partner-links-grid">
+                <a href="https://www.teltonika-gps.com/" target="_blank" class="partner-link-card teltonika-link">
+                    <div class="partner-icon">📶</div>
+                    <h4>Teltonika GPS</h4>
+                    <p>GPS Trackers, Video Telematics & Accessories</p>
+                    <span class="visit-btn">Visit Website →</span>
+                </a>
+                
+                <a href="https://naturelinktech.com/" target="_blank" class="partner-link-card naturelink-link">
+                    <div class="partner-icon">🌍</div>
+                    <h4>Naturelink Tech</h4>
+                    <p>GNSS Trackers, AI Dashcam & Mobile DVR</p>
+                    <span class="visit-btn">Visit Website →</span>
+                </a>
+                
+                <a href="https://www.howentech.com/" target="_blank" class="partner-link-card howen-link">
+                    <div class="partner-icon">📹</div>
+                    <h4>Howen Tech</h4>
+                    <p>Mini Dashcam & Smart Video Solutions</p>
+                    <span class="visit-btn">Visit Website →</span>
+                </a>
+                
+                <a href="https://eurosenstelematics.com/" target="_blank" class="partner-link-card eurosens-link">
+                    <div class="partner-icon">⛽</div>
+                    <h4>Eurosens (Mechatronics)</h4>
+                    <p>Fuel Sensors & Industrial Monitoring</p>
+                    <span class="visit-btn">Visit Website →</span>
+                </a>
             </div>
         </div>
         
@@ -799,6 +963,21 @@
                         👁️ View Products
                     </button>
                     <div class="sync-status status-idle" id="naturelink-status">Ready to sync</div>
+                </div>
+                
+                <div class="sync-card">
+                    <div class="company-sync-status">
+                        <div class="sync-indicator" id="howen-indicator"></div>
+                        <h4>Howen Tech</h4>
+                    </div>
+                    <p style="color: #64748b; margin-bottom: 15px;">Mini Dashcam, GPS Trackers, AI Video Solutions</p>
+                    <button class="sync-btn" onclick="syncCompanyData('howen')" id="howen-sync-btn">
+                        🔄 Sync Howen
+                    </button>
+                    <button class="sync-btn" onclick="viewCompanyProducts('howen')">
+                        👁️ View Products
+                    </button>
+                    <div class="sync-status status-idle" id="howen-status">Ready to sync</div>
                 </div>
                 
                 <div class="sync-card">
@@ -976,12 +1155,12 @@
             { company: "Mechatronics", category: "Accessories", subcategory: "Monitor", name: "Eurosens Monitor", connectivity: "RS485", platform: "Universal", features: "Fuel monitoring station; Real-time data visualization; Multi-sensor support; Alert system; Comprehensive monitoring", status: "Standard", price_range: "Premium", use_case: "Monitoring Station" },
             { company: "Mechatronics", category: "Accessories", subcategory: "Equipment", name: "Eurosens Deaerator", connectivity: "Mechanical", platform: "Universal", features: "Fuel deaeration system; Air bubble removal; Flow measurement accuracy; System optimization; Mechanical integration", status: "Standard", price_range: "Mid", use_case: "Flow Optimization" },
             
-            // OWEN Products (Estimated based on typical industrial automation products)
-            { company: "Owen", category: "Tracker", subcategory: "Industrial", name: "Owen GPS-I", connectivity: "4G", platform: "Owen", features: "Industrial GPS tracker; Extreme temperature operation; Vibration resistant; Multiple I/O", status: "Standard", price_range: "Premium", use_case: "Industrial Tracking" },
-            { company: "Owen", category: "Accessories", subcategory: "Temperature Sensor", name: "Owen TRM", connectivity: "RS485", platform: "Owen", features: "Industrial temperature sensor; High accuracy; Wide temperature range; Modbus protocol", status: "Standard", price_range: "Mid", use_case: "Industrial Temperature" },
-            { company: "Owen", category: "Accessories", subcategory: "Controller", name: "Owen PLK", connectivity: "Ethernet", platform: "Owen", features: "Programmable logic controller; Industrial automation; Multiple protocols; Robust design", status: "Standard", price_range: "Premium", use_case: "Industrial Control" },
-            { company: "Owen", category: "Accessories", subcategory: "Interface", name: "Owen AC", connectivity: "RS485", platform: "Owen", features: "Interface converter; Protocol conversion; Industrial grade; Easy configuration", status: "Standard", price_range: "Mid", use_case: "Protocol Conversion" },
-            { company: "Owen", category: "Accessories", subcategory: "Power Supply", name: "Owen PS", connectivity: "Wired", platform: "Owen", features: "Industrial power supply; Wide input range; High efficiency; Compact design", status: "Standard", price_range: "Mid", use_case: "Industrial Power" }
+            // HOWEN TECH Products
+            { company: "Howen Tech", category: "Video Telematics", subcategory: "Mini Dashcam", name: "Howen Mini Dashcam", connectivity: "WiFi/4G", platform: "Howen", features: "Compact design; High-definition recording; WiFi connectivity; Mobile app integration; Real-time monitoring; Cloud storage support", status: "Standard", price_range: "Mid", use_case: "Vehicle Video Recording" },
+            { company: "Howen Tech", category: "Tracker", subcategory: "GPS Tracker", name: "Howen GPS Tracker Pro", connectivity: "4G LTE", platform: "Howen", features: "Real-time GPS tracking; Geofencing; Mobile alerts; Long battery life; Waterproof design; Anti-theft protection", status: "Standard", price_range: "Mid", use_case: "Asset Tracking" },
+            { company: "Howen Tech", category: "Video Telematics", subcategory: "AI Dashcam", name: "Howen AI Smart Cam", connectivity: "4G LTE/WiFi", platform: "Howen", features: "AI-powered analytics; Driver behavior monitoring; Collision detection; Night vision; Cloud integration; Real-time streaming", status: "Standard", price_range: "Premium", use_case: "AI Video Analytics" },
+            { company: "Howen Tech", category: "Accessories", subcategory: "Power Supply", name: "Howen Power Adapter", connectivity: "Wired", platform: "Howen", features: "Universal power adapter; Multiple voltage support; Surge protection; Compact design; Easy installation", status: "Standard", price_range: "Budget", use_case: "Power Supply" },
+            { company: "Howen Tech", category: "Accessories", subcategory: "Mounting Kit", name: "Howen Mount Pro", connectivity: "Mechanical", platform: "Howen", features: "Universal mounting solution; Adjustable angles; Vibration resistant; Easy installation; Durable materials", status: "Standard", price_range: "Budget", use_case: "Device Mounting" }
         ];
 
         function generateMasterExcel() {
@@ -1366,6 +1545,17 @@
                 lastSync: null,
                 totalFound: 0
             },
+            howen: {
+                name: 'Howen Tech',
+                url: 'https://www.howentech.com/products',
+                productPagesUrls: [
+                    'https://www.howentech.com/products',
+                    'https://www.howentech.com/mini-dashcam'
+                ],
+                category: 'Video Telematics',
+                lastSync: null,
+                totalFound: 0
+            },
             eurosens: {
                 name: 'Eurosens (Mechatronics)',
                 url: 'https://eurosenstelematics.com/en/home-page/products',
@@ -1557,6 +1747,36 @@
                         status: "New",
                         price_range: "Premium",
                         use_case: "Passenger Counter",
+                        source_url: config.url,
+                        discovered_date: new Date().toISOString()
+                    }
+                ],
+                howen: [
+                    {
+                        company: "Howen Tech",
+                        category: "Video Telematics",
+                        subcategory: "Advanced Dashcam",
+                        name: "Howen Pro Dash 4K",
+                        connectivity: "4G LTE/WiFi",
+                        platform: "Howen",
+                        features: "4K Ultra HD recording; Dual camera system; AI driver assistance; Cloud connectivity; Mobile app control; Night vision enhancement",
+                        status: "New",
+                        price_range: "Premium",
+                        use_case: "Professional Video Recording",
+                        source_url: config.url,
+                        discovered_date: new Date().toISOString()
+                    },
+                    {
+                        company: "Howen Tech",
+                        category: "Tracker",
+                        subcategory: "Smart Tracker",
+                        name: "Howen Track Plus",
+                        connectivity: "4G LTE/GPS",
+                        platform: "Howen",
+                        features: "Advanced GPS tracking; Real-time location sharing; Geofencing alerts; Long battery life; Mobile notifications; Theft protection",
+                        status: "New",
+                        price_range: "Mid",
+                        use_case: "Smart Asset Tracking",
                         source_url: config.url,
                         discovered_date: new Date().toISOString()
                     }
@@ -1778,6 +1998,10 @@
                 companyProducts = inventoryData.filter(device => 
                     device.company.toLowerCase().includes('mechatronics') || 
                     device.company.toLowerCase().includes('eurosens')
+                );
+            } else if (companyKey === 'howen') {
+                companyProducts = inventoryData.filter(device => 
+                    device.company.toLowerCase().includes('howen')
                 );
             } else {
                 companyProducts = inventoryData.filter(device => 

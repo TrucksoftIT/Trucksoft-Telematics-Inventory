@@ -7,7 +7,7 @@ A comprehensive device synchronization and inventory management system for telem
 ## Features
 - 🔄 Real-time device synchronization with partner websites
 - 📊 Excel report generation with comprehensive analytics
-- 🏢 Multi-partner support (Teltonika, Naturelink Tech, Eurosens/Mechatronics)
+- 🏢 Multi-partner support (Teltonika, Naturelink Tech, Howen Tech, Eurosens/Mechatronics)
 - 📱 Responsive web interface
 - 💾 Client-side data management with persistence
 - 🎯 Smart device categorization and filtering
@@ -15,6 +15,7 @@ A comprehensive device synchronization and inventory management system for telem
 ## Partner Integrations
 - **Teltonika GPS**: GPS trackers, video telematics, accessories
 - **Naturelink Tech**: GNSS trackers, AI dashcam, mobile DVR, cameras  
+- **Howen Tech**: Mini dashcam, smart video solutions, GPS trackers
 - **Eurosens (Mechatronics)**: Fuel sensors, flow meters, weighing systems
 
 ## Quick Start
